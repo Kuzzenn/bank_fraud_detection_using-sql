@@ -36,6 +36,8 @@ import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import Transactions from "./pages/Transactions";
 import FraudLogs from "./pages/FraudLogs";
+import AddFraudRule from "./pages/AddFraudRule"
+import AccountsPage from "./pages/AccountsPage"
 // Additional page like Accounts or FraudRules can be added similarly
 
 const App = () => {
@@ -50,6 +52,9 @@ const App = () => {
             <Route path="/users" element={<Users />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/fraud-logs" element={<FraudLogs />} />
+            <Route path="/fraud-rules" element={<AddFraudRule />} />
+            <Route path="/accounts" element={<AccountsPage/>} />
+
             <Route path="/" element={<Navigate to="/dashboard" />} />
           </Routes>
         </Box>

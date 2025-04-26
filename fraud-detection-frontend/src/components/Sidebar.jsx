@@ -23,9 +23,11 @@ const Sidebar = () => {
         <List>
           {[
             { text: "Dashboard", route: "/dashboard" },
-            { text: "Customers", route: "/customers" },
+            { text: "Users", route: "/users" },
             { text: "Transactions", route: "/transactions" },
             { text: "Fraud Logs", route: "/fraud-logs" },
+            { text: "Fraud Rules", route: "/fraud-rules" },
+            { text: "Accounts", route: "/accounts" },
           ].map((item, index) => (
             <ListItem button component={Link} to={item.route} key={index}>
               <ListItemText primary={item.text} />

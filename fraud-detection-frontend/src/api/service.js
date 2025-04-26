@@ -36,3 +36,15 @@ export const resolveFraud = async (logId) => {
   });
   return response.json();
 };
+
+
+export const createFraudRule = async (ruleData) => {
+  const response = await fetch(`${API_BASE_URL}/fraud-rules`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(ruleData),
+  });
+  return response.json();
+};

@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Example connection string; update with your PostgreSQL credentials
-DATABASE_URL = os.environ.get("DATABASE_URL", "dbname=check123 user=postgres password=hannan host=localhost")
+DATABASE_URL = os.environ.get("DATABASE_URL", "dbname=practice user=postgres password=3783 host=localhost")
 
 @app.route('/')
 def index():
@@ -28,7 +28,7 @@ def get_dashboard_stats():
     cur.execute("SELECT COUNT(*) AS total_transactions FROM Transactions;")
     total_transactions = cur.fetchone()["total_transactions"]
 
-    cur.execute("SELECT COUNT(*) AS fraud_incidents FROM FraudLogs WHERE status='pending';")
+    cur.execute("SELECT COUNT(*) AS fraud_incidents FROM TransactionLogs WHERE status='pending';")
     fraud_incidents = cur.fetchone()["fraud_incidents"]
 
     cur.close()
@@ -85,25 +85,97 @@ def get_fraud_rules():
     conn.close()
     return jsonify(rules)
 
+@app.route('/api/fraud-rules', methods=['POST'])
+def create_fraud_rule():
+    data = request.get_json()
+    rule_name = data.get('rule_name')
+    rule_description = data.get('rule_description')
+    action = data.get('action')
+    risk_level = data.get('risk_level')
+    precedence = data.get('precedence')
+
+    if not all([rule_name, action, risk_level, precedence]):
+        return jsonify({"error": "Missing required fields."}), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO FraudRules (rule_name, rule_description, action, risk_level, precedence)
+        VALUES (%s, %s, %s, %s, %s);
+    """, (rule_name, rule_description, action, risk_level, precedence))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return jsonify({"message": "Fraud rule created successfully."})
+
+
 @app.route('/api/fraud-logs', methods=['GET'])
 def get_fraud_logs():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-        SELECT f.log_id, f.transaction_id, f.rule_id, f.detected_rule, f.status, f.created_at, t.amount, t.transaction_time 
-        FROM FraudLogs f
-        JOIN Transactions t ON f.transaction_id = t.transaction_id;
+        SELECT 
+            f.log_id,
+            f.transaction_id,
+            COALESCE(t.account_id, 0) AS account_id,  -- make sure if missing, 0 is returned
+            f.rule_id,
+            f.detected_rule,
+            f.status,
+            f.created_at,
+            t.amount,
+            t.transaction_time 
+        FROM TransactionLogs f
+        LEFT JOIN Transactions t ON f.transaction_id = t.transaction_id;
     """)
     fraud_logs = cur.fetchall()
     cur.close()
     conn.close()
     return jsonify(fraud_logs)
 
+
+
+@app.route('/api/update-fraud-action', methods=['POST'])
+def update_fraud_action():
+    data = request.get_json()
+    log_id = data.get('log_id')
+    account_id = data.get('account_id')
+    new_status = data.get('new_status')
+
+    if not all([log_id, account_id, new_status]):
+        return jsonify({"error": "Missing data"}), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Update FraudLogs
+    cur.execute("""
+        UPDATE TransactionLogs
+        SET status = %s
+        WHERE log_id = %s;
+    """, (new_status, log_id))
+
+    # Update Accounts
+    cur.execute("""
+        UPDATE Accounts
+        SET account_status = %s
+        WHERE account_id = %s;
+    """, (new_status, account_id))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return jsonify({"message": "Fraud action updated successfully."})
+
+
+
+
 @app.route('/api/resolve/<int:log_id>', methods=['POST'])
 def resolve_fraud(log_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("UPDATE FraudLogs SET status='resolved' WHERE log_id = %s;", (log_id,))
+    cur.execute("UPDATE TransactionLogs SET status='resolved' WHERE log_id = %s;", (log_id,))
     conn.commit()
     cur.close()
     conn.close()
