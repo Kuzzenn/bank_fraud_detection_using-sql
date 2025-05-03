@@ -7,7 +7,87 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  background-color: #121212;
+  color: #FFFFFF;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+a {
+  color: #BB86FC;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Add this to handle default MUI Paper backgrounds */
+.MuiPaper-root {
+  background-color: #1E1E1E !important;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.sidebar {
+  width: 250px;
+  background-color: #1E1E1E;
+  padding: 10px;
+  height: 100vh;
+}
+
+.menu-item {
+  width: 100%;
+  background: none;
+  color: #BB86FC;
+  border: none;
+  text-align: left;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.menu-item:hover {
+  background-color: #BB86FC;
+  color: #1E1E1E;
+}
+
+.submenu {
+  display: none;
+  margin-left: 10px;
+}
+
+.submenu a {
+  display: block;
+  color: #B0B0B0;
+  padding: 5px;
+  text-decoration: none;
+}
+
+.submenu a:hover {
+  color: #FFFFFF;
+}
+/* Add this to styles.css */
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #1E1E1E;
+  padding: 10px 0;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+header h1 {
+  margin: 0;
+  padding: 0;
+  color: #FFFFFF;
+  font-size: 24px;
+  font-weight: bold;
+}
+
