@@ -1,165 +1,160 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography, TextField, Button, MenuItem, Paper, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
-import { createFraudRule, fetchFraudRules } from "../api/service"; // Use your existing service methods
+import React, { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Fab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+} from "@mui/material";
+import { Add as AddIcon } from "@mui/icons-material";
 
-const ManageFraudRules = () => {
-  const [formData, setFormData] = useState({
-    rule_name: "",
-    rule_description: "",
+const FraudRules = () => {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [rules, setRules] = useState([]);
+  const [newRule, setNewRule] = useState({
+    name: "",
+    description: "",
     action: "",
-    risk_level: "",
-    precedence: ""
+    riskLevel: "",
+    precedence: "",
+    status: "Active",
   });
 
-  const [rules, setRules] = useState([]);
+  const handleDialogOpen = () => setOpenDialog(true);
+  const handleDialogClose = () => setOpenDialog(false);
 
-  useEffect(() => {
-    loadRules();
-  }, []);
-
-  const loadRules = async () => {
-    try {
-      const data = await fetchFraudRules();
-      setRules(data);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to fetch fraud rules.");
-    }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewRule({ ...newRule, [name]: value });
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+  const handleAddRule = () => {
+    setRules([...rules, { id: rules.length + 1, ...newRule }]);
+    setNewRule({
+      name: "",
+      description: "",
+      action: "",
+      riskLevel: "",
+      precedence: "",
+      status: "Active",
     });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await createFraudRule(formData);
-      alert("Fraud Rule Created Successfully!");
-      setFormData({
-        rule_name: "",
-        rule_description: "",
-        action: "",
-        risk_level: "",
-        precedence: ""
-      });
-      loadRules(); // Reload the table after adding
-    } catch (error) {
-      console.error(error);
-      alert("Failed to create rule. Please try again.");
-    }
+    handleDialogClose();
   };
 
   return (
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom fontWeight={700}>
-        Manage Fraud Rules
-      </Typography>
+    <div style={{ backgroundColor: "#121212", minHeight: "100vh", color: "#fff", padding: "20px" }}>
+      <h1 style={{ textAlign: "center" }}>Manage Fraud Rules</h1>
+      <TableContainer component={Paper} style={{ backgroundColor: "FEF3E2" }}>
+        <Table>
+          <TableHead style={{ backgroundColor: "#e0e0e0" }}>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Rule Name</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>Action</TableCell>
+              <TableCell>Risk Level</TableCell>
+              <TableCell>Precedence</TableCell>
+              <TableCell>Status</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rules.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  No rules added yet.
+                </TableCell>
+              </TableRow>
+            ) : (
+              rules.map((rule) => (
+                <TableRow key={rule.id}>
+                  <TableCell>{rule.id}</TableCell>
+                  <TableCell>{rule.name}</TableCell>
+                  <TableCell>{rule.description}</TableCell>
+                  <TableCell>{rule.action}</TableCell>
+                  <TableCell>{rule.riskLevel}</TableCell>
+                  <TableCell>{rule.precedence}</TableCell>
+                  <TableCell>{rule.status}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      {/* Add Fraud Rule Form */}
-      <Paper elevation={4} sx={{ padding: 3, mb: 5, maxWidth: 600 }}>
-        <Typography variant="h6" gutterBottom fontWeight={600}>
+      <Fab
+        color="primary"
+        aria-label="add"
+        style={{ position: "fixed", bottom: 16, right: 16 }}
+        onClick={handleDialogOpen}
+      >
+        <AddIcon />
+      </Fab>
+
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle style={{ backgroundColor: "F5ECD5", color: "#fff" }}>
           Add New Rule
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        </DialogTitle>
+        <DialogContent style={{ backgroundColor: "#f5f5f5" }}>
           <TextField
+            fullWidth
+            margin="dense"
             label="Rule Name"
-            name="rule_name"
-            value={formData.rule_name}
-            onChange={handleChange}
-            required
+            name="name"
+            value={newRule.name}
+            onChange={handleInputChange}
           />
           <TextField
-            label="Rule Description"
-            name="rule_description"
-            value={formData.rule_description}
-            onChange={handleChange}
-            multiline
-            rows={3}
-            required
+            fullWidth
+            margin="dense"
+            label="Description"
+            name="description"
+            value={newRule.description}
+            onChange={handleInputChange}
           />
           <TextField
+            fullWidth
+            margin="dense"
             label="Action"
             name="action"
-            value={formData.action}
-            onChange={handleChange}
-            select
-            required
-          >
-            <MenuItem value="block">Block</MenuItem>
-            <MenuItem value="restrict">Restrict</MenuItem>
-            <MenuItem value="limit">Limit</MenuItem>
-          </TextField>
+            value={newRule.action}
+            onChange={handleInputChange}
+          />
           <TextField
+            fullWidth
+            margin="dense"
             label="Risk Level"
-            name="risk_level"
-            value={formData.risk_level}
-            onChange={handleChange}
-            select
-            required
-          >
-            <MenuItem value="high">High</MenuItem>
-            <MenuItem value="medium">Medium</MenuItem>
-            <MenuItem value="low">Low</MenuItem>
-          </TextField>
+            name="riskLevel"
+            value={newRule.riskLevel}
+            onChange={handleInputChange}
+          />
           <TextField
+            fullWidth
+            margin="dense"
             label="Precedence"
             name="precedence"
             type="number"
-            value={formData.precedence}
-            onChange={handleChange}
-            required
-            InputProps={{ inputProps: { min: 1 } }}
+            value={newRule.precedence}
+            onChange={handleInputChange}
           />
-          <Button type="submit" variant="contained" size="large">
-            Create Rule
+        </DialogContent>
+        <DialogActions style={{ backgroundColor: "#f5f5f5" }}>
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleAddRule} color="primary">
+            Add Rule
           </Button>
-        </Box>
-      </Paper>
-
-      {/* Existing Fraud Rules Table */}
-      <Paper elevation={4} sx={{ padding: 3 }}>
-        <Typography variant="h6" gutterBottom fontWeight={600}>
-          Existing Rules
-        </Typography>
-        <Box sx={{ overflowX: "auto" }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>ID</strong></TableCell>
-                <TableCell><strong>Rule Name</strong></TableCell>
-                <TableCell><strong>Description</strong></TableCell>
-                <TableCell><strong>Action</strong></TableCell>
-                <TableCell><strong>Risk Level</strong></TableCell>
-                <TableCell><strong>Precedence</strong></TableCell>
-                <TableCell><strong>Status</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rules.map((rule) => (
-                <TableRow key={rule.rule_id}>
-                  <TableCell>{rule.rule_id}</TableCell>
-                  <TableCell>{rule.rule_name}</TableCell>
-                  <TableCell>{rule.rule_description}</TableCell>
-                  <TableCell>{rule.action.toUpperCase()}</TableCell>
-                  <TableCell>
-                    {rule.risk_level === "high" ? "🔥 High" :
-                     rule.risk_level === "medium" ? "⚠️ Medium" :
-                     "✅ Low"}
-                  </TableCell>
-                  <TableCell>{rule.precedence}</TableCell>
-                  <TableCell>{rule.active ? "Active" : "Inactive"}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
-      </Paper>
-    </Box>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 };
 
-export default ManageFraudRules;
+export default FraudRules;
