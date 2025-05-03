@@ -2,6 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
 import { fetchDashboardStats } from "../api/service";
 
+const darkTheme = {
+  background: "#121212",
+  card: "#1E1E1E",
+  textPrimary: "#FFFFFF",
+  textSecondary: "#B0B0B0",
+  highlight: "#BB86FC",
+};
+
 const Dashboard = () => {
   const [stats, setStats] = useState({});
 
@@ -10,7 +18,14 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <Box p={3}>
+    <Box
+      p={3}
+      sx={{
+        backgroundColor: darkTheme.background,
+        minHeight: "100vh",
+        color: darkTheme.textPrimary,
+      }}
+    >
       <Typography variant="h4" gutterBottom fontWeight={600}>
         Dashboard
       </Typography>
@@ -19,13 +34,19 @@ const Dashboard = () => {
           <Card
             elevation={4}
             sx={{
+              backgroundColor: darkTheme.card,
+              color: darkTheme.textPrimary,
               transition: "transform 0.3s",
               ":hover": { transform: "scale(1.02)" },
               borderRadius: 3,
             }}
           >
             <CardContent>
-              <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+              <Typography
+                variant="subtitle2"
+                style={{ color: darkTheme.textSecondary }}
+                gutterBottom
+              >
                 Total Users
               </Typography>
               <Typography variant="h4" fontWeight={700}>
@@ -39,13 +60,19 @@ const Dashboard = () => {
           <Card
             elevation={4}
             sx={{
+              backgroundColor: darkTheme.card,
+              color: darkTheme.textPrimary,
               transition: "transform 0.3s",
               ":hover": { transform: "scale(1.02)" },
               borderRadius: 3,
             }}
           >
             <CardContent>
-              <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+              <Typography
+                variant="subtitle2"
+                style={{ color: darkTheme.textSecondary }}
+                gutterBottom
+              >
                 Transactions
               </Typography>
               <Typography variant="h4" fontWeight={700}>
@@ -59,17 +86,22 @@ const Dashboard = () => {
           <Card
             elevation={4}
             sx={{
+              backgroundColor: darkTheme.card,
+              color: darkTheme.textPrimary,
               transition: "transform 0.3s",
               ":hover": { transform: "scale(1.02)" },
               borderRadius: 3,
-              bgcolor: "#ffe6e6", // Light red background
             }}
           >
             <CardContent>
-              <Typography variant="subtitle2" color="error" gutterBottom>
+              <Typography
+                variant="subtitle2"
+                style={{ color: darkTheme.highlight }}
+                gutterBottom
+              >
                 Fraud Incidents
               </Typography>
-              <Typography variant="h4" color="error" fontWeight={700}>
+              <Typography variant="h4" fontWeight={700} color="error">
                 {stats.fraud_incidents || 0}
               </Typography>
             </CardContent>
