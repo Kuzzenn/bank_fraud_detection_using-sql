@@ -1,50 +1,61 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Box from "@mui/material/Box";
-import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
+import { Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminLayout    from "./layouts/AdminLayout";
+import UserLayout     from "./layouts/UserLayout";
 
+import Signup from "./pages/Signup";
+import Login  from "./pages/Login";
 
-import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
-import Transactions from "./pages/Transactions";
-import FraudLogs from "./pages/FraudLogs";
-import AddFraudRule from "./pages/AddFraudRule"
-import AccountsPage from "./pages/AccountsPage"
+import Dashboard        from "./pages/Dashboard";
+import UsersPage        from "./pages/Users";
+import AdminFraudLogs   from "./pages/FraudLogs";
+import ManageFraudRules from "./pages/ManageFraudRules";
 
+import AccountsPage     from "./pages/AccountsPage";
+import UserTransactions from "./pages/Transactions";
+import TransferPage     from "./pages/TransferPage";
 
-
-const App = () => {
+export default function App() {
   return (
-    <Router>
-      <Box sx={{ display: "flex" }}>
-        <Sidebar />
-        <Box
-  component="main"
-  sx={{
-    flexGrow: 1,
-    p: 3,
-    marginLeft: { xs: 0, sm: "240px" }, // xs = mobile, sm+ = desktop
-    marginTop: "64px"
-  }}
->
-<Box sx={{ mt: "64px", ml: { md: "250px" }, p: 2 }}>
-  <Navbar />
-  <Routes>
-    <Route path="/dashboard" element={<Dashboard />} />
-    <Route path="/users" element={<Users />} />
-    <Route path="/transactions" element={<Transactions />} />
-    <Route path="/fraud-logs" element={<FraudLogs />} />
-    <Route path="/fraud-rules" element={<AddFraudRule />} />
-    <Route path="/accounts" element={<AccountsPage />} />
-    <Route path="/" element={<Navigate to="/dashboard" />} />
-  </Routes>
-</Box>
-</Box>
-      </Box>
-    </Router>
+    <Routes>
+      {/* Public */}
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login"  element={<Login  />} />
+
+      {/* Admin */}
+      <Route
+        path="/admin/*"
+        element={
+          <ProtectedRoute role="admin">
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="dashboard"   element={<Dashboard />} />
+        <Route path="users"       element={<UsersPage />} />
+        <Route path="fraud-logs"  element={<AdminFraudLogs />} />
+        <Route path="fraud-rules" element={<ManageFraudRules />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+      </Route>
+
+      {/* User */}
+      <Route
+        path="/user/*"
+        element={
+          <ProtectedRoute role="user">
+            <UserLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="accounts"     element={<AccountsPage />} />
+        <Route path="transactions" element={<UserTransactions />} />
+        <Route path="transfer"     element={<TransferPage />} />
+        <Route index element={<Navigate to="accounts" replace />} />
+      </Route>
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
-};
-
-export default App;
-
+}

@@ -1,22 +1,22 @@
-// src/pages/Users.jsx
+// src/pages/UsersPage.jsx
 
 import React, { useEffect, useState } from "react";
 import {
-  Box,
-  Typography,
   Paper,
-  TableContainer,
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
+  Typography,
+  Box,
   CircularProgress,
   Button,
 } from "@mui/material";
 import { fetchUsers } from "../api/service";
 
-export default function Users() {
+export default function UsersPage() {
   const [users, setUsers]     = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
@@ -57,24 +57,17 @@ export default function Users() {
 
   if (users.length === 0) {
     return (
-      <Box textAlign="center" mt={4}>
-        <Typography>No users found.</Typography>
-        <Button variant="outlined" onClick={loadUsers} sx={{ mt: 2 }}>
-          Refresh
-        </Button>
-      </Box>
+      <Typography align="center" sx={{ mt: 4 }}>
+        No users found.
+      </Typography>
     );
   }
 
   return (
     <Box sx={{ p: 4 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h4" gutterBottom>
-          Users
-        </Typography>
-        <Button onClick={loadUsers}>Refresh</Button>
-      </Box>
-
+      <Typography variant="h4" gutterBottom fontWeight={700}>
+        Users
+      </Typography>
       <TableContainer component={Paper} aria-label="Users table">
         <Table>
           <TableHead>
@@ -86,12 +79,12 @@ export default function Users() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((u) => (
-              <TableRow key={u.user_id}>
-                <TableCell>{u.user_id}</TableCell>
-                <TableCell>{u.username}</TableCell>
-                <TableCell>{u.email}</TableCell>
-                <TableCell>{u.role}</TableCell>
+            {users.map((user) => (
+              <TableRow key={user.user_id}>
+                <TableCell>{user.user_id}</TableCell>
+                <TableCell>{user.username}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.role}</TableCell>
               </TableRow>
             ))}
           </TableBody>

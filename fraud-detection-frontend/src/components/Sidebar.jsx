@@ -10,17 +10,15 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import {
-  Menu as MenuIcon,
-  Dashboard as DashboardIcon,
-  AccountCircle,
-  Receipt,
-  Gavel,
-  Warning,
-} from "@mui/icons-material";
+import { Menu as MenuIcon } from "@mui/icons-material";
 import { Link, useLocation } from "react-router-dom";
 
-const Sidebar = () => {
+/**
+ * A reusable Sidebar component that accepts dynamic menu items.
+ * Props:
+ * - items: Array<{ text: string, icon: ReactNode, path: string }>
+ */
+export default function Sidebar({ items }) {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -28,14 +26,8 @@ const Sidebar = () => {
 
   const toggleDrawer = (openState) => () => setOpen(openState);
 
-  const menuItems = [
-    { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
-    { text: "Users", icon: <AccountCircle />, path: "/users" },
-    { text: "Transactions", icon: <Receipt />, path: "/transactions" },
-    { text: "Fraud Logs", icon: <Warning />, path: "/fraud-logs" },
-    { text: "Fraud Rules", icon: <Gavel />, path: "/fraud-rules" },
-    { text: "Accounts", icon: <AccountCircle />, path: "/accounts" },
-  ];
+  // Determine the active item by matching the current pathname
+  const isActive = (path) => location.pathname === path;
 
   return (
     <>
@@ -49,11 +41,10 @@ const Sidebar = () => {
             left: 16,
             zIndex: 1300,
             backgroundColor: "#2C2C2C",
-            "&:hover": {
-              backgroundColor: "#3a3a3a",
-            },
+            "&:hover": { backgroundColor: "#3a3a3a" },
             boxShadow: "0px 4px 12px rgba(0,0,0,0.4)",
           }}
+          aria-label="open menu"
         >
           <MenuIcon />
         </IconButton>
@@ -63,64 +54,54 @@ const Sidebar = () => {
         anchor="left"
         open={open}
         onClose={toggleDrawer(false)}
+        variant={isMobile ? "temporary" : "persistent"}
         sx={{
-          "& .MuiDrawer-paper": {
+          width: 260,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
             width: 260,
             pt: 8,
-            backgroundColor: "#1e1e1e",
-            color: "#FFFFFF",
-            borderRight: "1px solid #333",
-            boxShadow: "4px 0 12px rgba(0,0,0,0.6)",
+            backgroundColor: '#1e1e1e',
+            color: '#FFFFFF',
+            borderRight: '1px solid #333',
+            boxShadow: '4px 0 12px rgba(0,0,0,0.6)',
           },
         }}
       >
-        <Box sx={{ mt: 4 }}>
+        <Box sx={{ mt: 4 }} role="navigation">
           <List>
-            {menuItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <ListItem
-                  button
-                  key={item.text}
-                  component={Link}
-                  to={item.path}
-                  onClick={toggleDrawer(false)}
-                  sx={{
-                    mb: 1,
-                    borderRadius: "8px",
-                    mx: 2,
-                    backgroundColor: isActive ? "#BB86FC33" : "transparent",
-                    color: isActive ? "#BB86FC" : "#ccc",
-                    transition: "all 0.2s",
-                    "&:hover": {
-                      backgroundColor: "#BB86FC22",
-                      color: "#fff",
-                    },
-                  }}
-                >
-                  <ListItemIcon
-                    sx={{
-                      color: isActive ? "#BB86FC" : "#888",
-                      minWidth: "40px",
-                    }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.text}
-                    primaryTypographyProps={{
-                      fontSize: "16px",
-                      fontWeight: 500,
-                    }}
-                  />
-                </ListItem>
-              );
-            })}
+            {items.map(({ text, icon, path }) => (
+              <ListItem
+                button
+                key={text}
+                component={Link}
+                to={path}
+                onClick={toggleDrawer(false)}
+                sx={{
+                  mb: 1,
+                  borderRadius: '8px',
+                  mx: 2,
+                  backgroundColor: isActive(path) ? '#BB86FC33' : 'transparent',
+                  color: isActive(path) ? '#BB86FC' : '#ccc',
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    backgroundColor: '#BB86FC22',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ color: isActive(path) ? '#BB86FC' : '#888', minWidth: 40 }}>
+                  {icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={text}
+                  primaryTypographyProps={{ fontSize: '16px', fontWeight: 500 }}
+                />
+              </ListItem>
+            ))}
           </List>
         </Box>
       </Drawer>
     </>
   );
-};
-
-export default Sidebar;
+}
